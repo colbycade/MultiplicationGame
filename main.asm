@@ -52,6 +52,8 @@ main:
     # Mark the product as claimed for user
     li $a1, PLAYER
     jal mark_claimed
+    # Play sound effect for user move
+    jal sfx_user_move
     # Display user's first move
     li $a0, PLAYER
     li $a1, 1
@@ -122,16 +124,20 @@ UserTurn:
     li $a1, PLAYER
     jal check_win_for_product
     bnez $v0, UserWins
+    # Play sound effect for user move
+    jal sfx_user_move
     # Go to next turn
     li $s0, COMPUTER
     j GameLoop
 
 UserWins:
+    jal sfx_user_win
     li $v0, 4
     la $a0, msg_user_win
     syscall
     j Exit
 CompWins:
+    jal sfx_computer_win
     li $v0, 4
     la $a0, msg_comp_win
     syscall
