@@ -83,17 +83,17 @@ value_loop:
 
     # Evaluate priorities
     # Priority 1: Check for Winning Move
-    # move $a0, $s6
-    # li $a1, COMPUTER        
-    # jal check_win_for_product  # Hypothetically check if this product wins for Computer
-    # li $t0, SCORE_WINNING
-    # bnez $v0, update_best_move # If it wins, this is the best possible move
+    move $a0, $s6
+    li $a1, COMPUTER        
+    jal check_win_for_product  # Hypothetically check if this product wins for Computer
+    li $t0, SCORE_WINNING
+    bnez $v0, update_best_move # If it wins, this is the best possible move
 
-    # # Priority 2: Check for Blocking Move
-    # move $a0, $s6          
-    # li $a1, PLAYER          
-    # jal check_win_for_product  # Hypothetically check if Player wins by getting this product square
-    # bnez $v0, found_blocking_move # If Player would win, this move blocks them
+    # Priority 2: Check for Blocking Move
+    move $a0, $s6          
+    li $a1, PLAYER          
+    jal check_win_for_product  # Hypothetically check if Player wins by getting this product square
+    bnez $v0, found_blocking_move # If Player would win, this move blocks them
 
     # Priority 3: Check for Adjacent Move
     move $a0, $s6
