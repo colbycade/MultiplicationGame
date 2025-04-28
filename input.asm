@@ -45,8 +45,8 @@ input_choose_value:
     # Save return address since we call get_board_index
     addi $sp, $sp, -12
     sw $ra, 0($sp) 
-    sw $s0, 4($sp)  # Save $s0 (factor number)
-    sw $s1, 8($sp)  # Save $s1 (potential new value)
+    sw $s0, 4($sp)  
+    sw $s1, 8($sp) 
     
     move $s0, $a0 # Store factor number in $s0
 

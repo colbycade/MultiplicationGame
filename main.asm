@@ -94,11 +94,11 @@ CompTurn:
     j GameLoop
 UserTurn:
     # User chooses factor
-    jal input_choose_factor      # $v0=factorNum
+    jal input_choose_factor    # $v0=factorNum
     move $s1, $v0
     # User chooses value
     move $a0,$s1
-    jal input_choose_value       # $v0=value
+    jal input_choose_value     # $v0=value
     move $s2, $v0
     # Update the factors array
     sll $t0, $s1, 2       

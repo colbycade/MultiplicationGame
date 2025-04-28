@@ -32,15 +32,26 @@ msg_period_newline:   .asciiz ".\n"
 display_move:
     # Stack frame setup
     addi $sp, $sp, -20     # Allocate space for $ra, $s0-$s3
-    sw $ra, 16($sp)        # Save return address
-    sw $s0, 12($sp)        # Save $s0 (used for player ID)
-    sw $s1, 8($sp)         # Save $s1 (factor index)
-    sw $s2, 4($sp)         # Save $s2 (new value)
-    sw $s3, 0($sp)         # Save $s3 (factor values)        
+    sw $ra, 16($sp)
+    sw $s0, 12($sp)
+    sw $s1, 8($sp)
+    sw $s2, 4($sp)
+    sw $s3, 0($sp)     
 
     move $s0, $a0          # Store player ID
     move $s1, $a1          # Store factor index
     move $s2, $a2          # Store new value
+
+    # --- Display Matrices ---
+    # Display Game Matrix (Products)
+    la $a0, msg_mult_matrix_label
+    la $a1, game_matrix
+    jal print_matrix
+
+    # Display Owner Matrix (Current claims)
+    la $a0, msg_owner_matrix_label
+    la $a1, owner_matrix
+    jal print_matrix
 
     # --- Print Move Description Sentence ---
     # "{Player/Computer} changed the {first/second} factor to be {value}."
@@ -89,17 +100,6 @@ display_factor_to_msg:
     la $a0, msg_period_newline   # print period and newline
     syscall
 
-    # --- Display Matrices ---
-    # Display Game Matrix (Products)
-    la $a0, msg_mult_matrix_label
-    la $a1, game_matrix
-    jal print_matrix
-
-    # Display Owner Matrix (Current claims)
-    la $a0, msg_owner_matrix_label
-    la $a1, owner_matrix
-    jal print_matrix
-
     # --- Print Product Equation ---
     # "The product is now {factors[0]} x {factors[1]} = {product}."
     li $v0, 4
@@ -136,7 +136,7 @@ display_factor_to_msg:
     la $a0, newline   # Newline after equation
     syscall
 
-    # --- Stack Frame Teardown ---
+    # cleanup stack frame
     lw $s3, 0($sp)
     lw $s2, 4($sp)
     lw $s1, 8($sp)
