@@ -8,8 +8,6 @@
 .eqv SCORE_ADJACENT 2
 .eqv SCORE_BLOCKING 3
 .eqv SCORE_WINNING 4
-some_separator: .asciiz ", "
-newline: .asciiz "\n"
 
 .text
 .globl ai_select_initial_factor1, ai_select_move
@@ -71,20 +69,17 @@ value_loop:
     # Get the other factor's index and value
     li $t0, 1
     sub $t0, $t0, $s3       # other_factor_index = (1-f)
-    sll $t1, $t0, 2         
-    add $t1, $s5, $t1       
-    lw $t1, 0($t1)          # $t1 = other_factor_value
+    sll $t2, $t0, 2         
+    add $t2, $s5, $t2       
+    lw $t2, 0($t2)          # $t2 = other_factor_value
     # Calculate product
-    mul $s6, $t1, $s4       # $s6 = product = f * v      
+    mul $s6, $t2, $s4       # $s6 = product  
     move $a0, $s6           
     jal is_claimed          # $v0=1 if product is claimed, 0 otherwise
     move $t7, $v0
     bnez $t7, skip_move     # If move is not valid (product claimed), skip
 
     # If we reach here, the move (f, v) is valid
-    # Update best move if this is the first valid one found and nothing better exists
-    li $t0, SCORE_VALID
-    beq $s2, SCORE_NONE, update_best_move # If best_score <= 0, update with this first valid move
 
     # Evaluate priorities
     # Priority 1: Check for Winning Move
@@ -101,11 +96,15 @@ value_loop:
     # bnez $v0, found_blocking_move # If Player would win, this move blocks them
 
     # Priority 3: Check for Adjacent Move
-    # move $a0, $s6
-    # jal is_adjacent         # Check if neighbors are COMPUTER squares
-    # bnez $v0, found_adjacent_move # If adjacent
+    move $a0, $s6
+    jal is_adjacent         # Check if neighbors are COMPUTER squares
+    bnez $v0, found_adjacent_move # If adjacent
 
-    j skip_move # Move to next iteration if no priority found
+    # Update best move if this is the first valid one found
+    li $t0, SCORE_VALID
+    beq $s2, SCORE_NONE, update_best_move # If best_score <= 0, update with this first valid move
+    # Otherwise move to next iteration since move won't be better than current best
+    j skip_move 
 
 found_blocking_move:
     li $t0, SCORE_BLOCKING               
@@ -151,4 +150,154 @@ skip_move:
     lw $s0, 24($sp)
     lw $ra, 28($sp)
     addi $sp, $sp, 32
+    jr $ra
+
+
+# ==============================================================================
+# Check if any adjacent square is claimed by the computer
+# Input: $a0 = product
+# Output: $v0 = 1 if adjacent claimed by computer, 0 otherwise
+is_adjacent:
+    # Save registers and stack frame
+    addi $sp, $sp, -20      # Space for $ra, $s0-$s3
+    sw $ra, 16($sp)
+    sw $s0, 12($sp)         # s0: product
+    sw $s1, 8($sp)          # s1: index
+    sw $s2, 4($sp)          # s2: row
+    sw $s3, 0($sp)          # s3: col
+
+    move $s0, $a0          # Save product
+
+    # Find the board index for the product
+    jal get_board_index    # $a0 holds product
+    move $s1, $v0          # $s1 = index (0-35)
+
+    # Calculate row and col of index ($s1)
+    li $t0, 6
+    divu $s1, $t0
+    mflo $s2               # $s2 = row = index / 6
+    mfhi $s3               # $s3 = col = index % 6
+
+    # Check neighbors one by one. If a match is found, jump to ia_found_exit
+    # May be a better way to do this, but this is simple and clear
+    # Need to check boundaries before calculating index/address
+
+    # Check Up-Left (row > 0, col > 0) Offset: -7
+    li $t0, 0
+    ble $s2, $t0, ia_skip_ul  # if row <= 0, skip
+    ble $s3, $t0, ia_skip_ul  # if col <= 0, skip
+    addi $t1, $s1, -7        # neighbor_index
+    sll $t2, $t1, 2          # offset = neighbor_index * 4
+    la $t3, owner_matrix     # base address of owner_matrix
+    add $t3, $t3, $t2        # address = base + offset
+    lw $t4, 0($t3)           # owner = owner_matrix[neighbor_index]
+    li $t5, COMPUTER         # $t5 = COMPUTER (2)
+    beq $t4, $t5, ia_found_exit  # if owner == COMPUTER, exit found
+
+ia_skip_ul:
+    # Check Up (row > 0) Offset: -6
+    li $t0, 0
+    ble $s2, $t0, ia_skip_u   # if row <= 0, skip
+    addi $t1, $s1, -6        # neighbor_index
+    sll $t2, $t1, 2
+    la $t3, owner_matrix
+    add $t3, $t3, $t2
+    lw $t4, 0($t3)
+    li $t5, COMPUTER
+    beq $t4, $t5, ia_found_exit
+
+ia_skip_u:
+    # Check Up-Right (row > 0, col < 5) Offset: -5
+    li $t0, 0
+    ble $s2, $t0, ia_skip_ur  # if row <= 0, skip
+    li $t0, 5
+    bge $s3, $t0, ia_skip_ur  # if col >= 5, skip
+    addi $t1, $s1, -5        # neighbor_index
+    sll $t2, $t1, 2
+    la $t3, owner_matrix
+    add $t3, $t3, $t2
+    lw $t4, 0($t3)
+    li $t5, COMPUTER
+    beq $t4, $t5, ia_found_exit
+
+ia_skip_ur:
+    # Check Left (col > 0) Offset: -1
+    li $t0, 0
+    ble $s3, $t0, ia_skip_l   # if col <= 0, skip
+    addi $t1, $s1, -1        # neighbor_index
+    sll $t2, $t1, 2
+    la $t3, owner_matrix
+    add $t3, $t3, $t2
+    lw $t4, 0($t3)
+    li $t5, COMPUTER
+    beq $t4, $t5, ia_found_exit
+
+ia_skip_l:
+    # Check Right (col < 5) Offset: +1
+    li $t0, 5
+    bge $s3, $t0, ia_skip_r   # if col >= 5, skip
+    addi $t1, $s1, 1         # neighbor_index
+    sll $t2, $t1, 2
+    la $t3, owner_matrix
+    add $t3, $t3, $t2
+    lw $t4, 0($t3)
+    li $t5, COMPUTER
+    beq $t4, $t5, ia_found_exit
+
+ia_skip_r:
+    # Check Down-Left (row < 5, col > 0) Offset: +5
+    li $t0, 5
+    bge $s2, $t0, ia_skip_dl  # if row >= 5, skip
+    li $t0, 0
+    ble $s3, $t0, ia_skip_dl  # if col <= 0, skip
+    addi $t1, $s1, 5         # neighbor_index
+    sll $t2, $t1, 2
+    la $t3, owner_matrix
+    add $t3, $t3, $t2
+    lw $t4, 0($t3)
+    li $t5, COMPUTER
+    beq $t4, $t5, ia_found_exit
+
+ia_skip_dl:
+    # Check Down (row < 5) Offset: +6
+    li $t0, 5
+    bge $s2, $t0, ia_skip_d   # if row >= 5, skip
+    addi $t1, $s1, 6         # neighbor_index
+    sll $t2, $t1, 2
+    la $t3, owner_matrix
+    add $t3, $t3, $t2
+    lw $t4, 0($t3)
+    li $t5, COMPUTER
+    beq $t4, $t5, ia_found_exit
+
+ia_skip_d:
+    # Check Down-Right (row < 5, col < 5) Offset: +7
+    li $t0, 5
+    bge $s2, $t0, ia_skip_dr  # if row >= 5, skip
+    bge $s3, $t0, ia_skip_dr  # if col >= 5, skip
+    addi $t1, $s1, 7         # neighbor_index
+    sll $t2, $t1, 2
+    la $t3, owner_matrix
+    add $t3, $t3, $t2
+    lw $t4, 0($t3)
+    li $t5, COMPUTER
+    beq $t4, $t5, ia_found_exit
+
+ia_skip_dr:
+    # If we checked all valid neighbors and none matched
+ia_not_found_exit:
+    li $v0, 0       # Return 0 (no adjacent found)
+    j ia_exit
+
+ia_found_exit:
+    li $v0, 1       # Return 1 (adjacent found)
+
+ia_exit:
+    # Restore registers and stack frame
+    lw $s3, 0($sp)
+    lw $s2, 4($sp)
+    lw $s1, 8($sp)
+    lw $s0, 12($sp)
+    lw $ra, 16($sp)
+    addi $sp, $sp, 20
     jr $ra
