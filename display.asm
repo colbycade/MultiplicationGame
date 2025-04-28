@@ -1,7 +1,7 @@
 # Display Functions
 .data
 # Display strings
-msg_mult_matrix_label:   .asciiz "Multiplication Matrix:\n"
+msg_mult_matrix_label:   .asciiz "\nMultiplication Matrix:\n"
 msg_owner_matrix_label:  .asciiz "Matrix of Claimed Positions (0=unclaimed, 1=player, 2=computer):\n"
 msg_prod_label:      .asciiz "The current product is: "
 mult:            .asciiz " x "
@@ -89,6 +89,17 @@ display_factor_to_msg:
     la $a0, msg_period_newline   # print period and newline
     syscall
 
+    # --- Display Matrices ---
+    # Display Game Matrix (Products)
+    la $a0, msg_mult_matrix_label
+    la $a1, game_matrix
+    jal print_matrix
+
+    # Display Owner Matrix (Current claims)
+    la $a0, msg_owner_matrix_label
+    la $a1, owner_matrix
+    jal print_matrix
+
     # --- Print Product Equation ---
     # "The product is now {factors[0]} x {factors[1]} = {product}."
     li $v0, 4
@@ -124,17 +135,6 @@ display_factor_to_msg:
     li $v0, 4
     la $a0, newline   # Newline after equation
     syscall
-
-    # --- Display Matrices ---
-    # Display Game Matrix (Products)
-    la $a0, msg_mult_matrix_label
-    la $a1, game_matrix
-    jal print_matrix
-
-    # Display Owner Matrix (Current claims)
-    la $a0, msg_owner_matrix_label
-    la $a1, owner_matrix
-    jal print_matrix
 
     # --- Stack Frame Teardown ---
     lw $s3, 0($sp)

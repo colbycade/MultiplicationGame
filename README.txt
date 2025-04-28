@@ -8,13 +8,16 @@
         15, 16, 18, 20, 21, 24, 
         25, 27, 28, 30, 32, 35, 
         36, 40, 42, 45, 48, 49, 
-        54, 56, 63, 64, 72, 81.
+        54, 56, 63, 64, 72, 81
+- Board state (initalized as all 0)
+    - 0: Unclaimed
+    - 1: Claimed by User
+    - 2: Claimed by Computer
 
 # Gameplay
 1. Computer goes first by moving the "below" pointer to any position 1-9
 2. User responds by moving the "above" pointer to any position 1-9
-3. After initial moves, players take turns moving either pointer
-4. Rules for valid moves:
-    - The pointer must change to a different number than before
-    - The resulting product must not have been already claimed
+3. The product of the two pointers is "claimed" for the user
+4. After initial moves, players take turns moving either pointer
+    a. To be a valid move, the resulting product must not already be claimed
 5. After each player makes a move, check if the player has won by having four claimed products in a row (horizontal, vertical, or diagonal)

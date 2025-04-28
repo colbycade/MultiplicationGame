@@ -1,7 +1,7 @@
 # Handle user input and validation
 .data
-msg_factor_prompt:      .asciiz "Choose which factor to change (0=first, 1=second): "
-msg_factor_error:       .asciiz "Invalid input, must enter '0' or '1'.\n"
+msg_factor_prompt:      .asciiz "\nChoose which factor to change (1=first, 2=second): "
+msg_factor_error:       .asciiz "Invalid input, must enter '1' or '2'.\n"
 msg_value_prompt:         .asciiz "Enter a value 1-9: "
 msg_value_range_error:     .asciiz "Invalid value, must be 1-9.\n"
 msg_value_taken_error:     .asciiz "You must choose a new value.\n"
@@ -22,10 +22,10 @@ input_choose_factor:
     syscall
     move $t0, $v0
 
-    # Verify input is 0 or 1
-    li $t1, 0
-    li $t2, 1
+    # Verify input is 1 or 2
+    li $t1, 1
     beq $t0, $t1, valid_input
+    li $t2, 2
     beq $t0, $t2, valid_input
 
     li $v0, 4  # Print error message
@@ -34,7 +34,7 @@ input_choose_factor:
     j input_choose_factor  # Retry
 
 valid_input:
-    move $v0, $t0  # Return valid input
+    subi $v0, $t0, 1  # Convert to 0-based index
     jr $ra
 
 # ==============================================================================
