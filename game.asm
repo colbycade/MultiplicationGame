@@ -1,7 +1,6 @@
 # Gamestate Data and Logic
 
 .data
-newline : .asciiz "\n"
 .globl factors, game_matrix, owner_matrix
 # Two factors to be multiplied (factor1=0, factor2=1)
 factors:   .word 0,0  # unassigned initially
@@ -132,11 +131,11 @@ check_win_for_product: # cwp_ for helpers
     bnez $v0, cwp_found_win # If diag DL win found, return 1
 
     # If no win found in any direction
-    li $v0, 0              # Return 0 (no win)
+    li $v0, 0   # Return 0 (no win)
     j cwp_exit
 
 cwp_found_win:
-    li $v0, 1              # Return 1 (win)
+    li $v0, 1   # Return 1 (win)
 
 cwp_exit:
     # stack frame cleanup
@@ -150,6 +149,10 @@ cwp_exit:
 # Checks horizontal lines of 4 passing through idx ($s1) for playerID ($s0)
 # Output: $v0 = 1 if win found, 0 otherwise
 cwp_check_horizontal:
+    # Save return address
+    addi $sp, $sp, -4
+    sw $ra, 0($sp)
+
     # Calculate row and col of idx ($s1)
     li $t0, 6
     divu $s1, $t0          
@@ -211,15 +214,24 @@ hor_skip3:
 hor_skip4:
     # No horizontal win found
     li $v0, 0
-    jr $ra
+    j hor_exit
+
 hor_win:
     li $v0, 1
-    jr $ra
+
+hor_exit:
+    lw $ra, 0($sp)  
+    addi $sp, $sp, 4 
+    jr $ra           
 
 # Helper: Check Vertical Lines for check_win_for_product
 # Checks vertical lines of 4 passing through idx ($s1) for playerID ($s0)
 # Output: $v0 = 1 if win found, 0 otherwise
 cwp_check_vertical:
+    # Save return address
+    addi $sp, $sp, -4
+    sw $ra, 0($sp)
+    
     # Calculate row and col of idx ($s1)
     li $t0, 6
     divu $s1, $t0          
@@ -280,15 +292,24 @@ ver_skip3:
 ver_skip4:
     # No vertical win found
     li $v0, 0
-    jr $ra
+    j ver_exit
+
 ver_win:
     li $v0, 1
-    jr $ra
+
+ver_exit:
+    lw $ra, 0($sp)  
+    addi $sp, $sp, 4 
+    jr $ra       
 
 # Helper: Check Diagonal Down-Right Lines for check_win_for_product
 # Checks diagonal (top-left to bottom-right) lines of 4 passing through idx ($s1) for playerID ($s0)
 # Output: $v0 = 1 if win found, 0 otherwise
 cwp_check_diag_dr:
+    # Save return address
+    addi $sp, $sp, -4
+    sw $ra, 0($sp)
+    
     # Calculate row and col of idx ($s1)
     li $t0, 6
     divu $s1, $t0          
@@ -356,15 +377,24 @@ dr_skip3:
 dr_skip4:
     # No diagonal DR win found
     li $v0, 0
-    jr $ra
+    j dr_exit
+
 dr_win:
     li $v0, 1
-    jr $ra
+
+dr_exit:
+    lw $ra, 0($sp)  
+    addi $sp, $sp, 4 
+    jr $ra       
 
 # Helper: Check Diagonal Down-Left Lines for check_win_for_product
 # Checks diagonal (top-right to bottom-left) lines of 4 passing through idx ($s1) for playerID ($s0)
 # Output: $v0 = 1 if win found, 0 otherwise
 cwp_check_diag_dl:
+    # Save return address
+    addi $sp, $sp, -4
+    sw $ra, 0($sp)
+    
     # Calculate row and col of idx ($s1)
     li $t0, 6
     divu $s1, $t0          
@@ -438,10 +468,15 @@ dl_skip3:
 dl_skip4:
     # No diagonal DL win found
     li $v0, 0
-    jr $ra
+    j dl_exit
+
 dl_win:
     li $v0, 1
-    jr $ra
+
+dl_exit:
+    lw $ra, 0($sp)  
+    addi $sp, $sp, 4 
+    jr $ra       
 
 # Helper: Check if 3 Squares are owned by the same player
 # Input: $a0, $a1, $a2 = indices, $a3 = playerID to check against

@@ -87,8 +87,8 @@ CompTurn:
     # Check if computer wins
     move $a0, $s4
     li $a1, COMPUTER
-    # jal check_win_for_product
-    # bnez $v0, CompWins
+    jal check_win_for_product
+    bnez $v0, CompWins
     # Go to next turn
     li $s0, PLAYER
     j GameLoop
@@ -120,8 +120,8 @@ UserTurn:
     # Check if user wins
     move $a0, $s4
     li $a1, PLAYER
-    # jal check_win_for_product
-    # bnez $v0, UserWins
+    jal check_win_for_product
+    bnez $v0, UserWins
     # Go to next turn
     li $s0, COMPUTER
     j GameLoop
