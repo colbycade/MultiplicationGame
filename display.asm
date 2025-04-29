@@ -1,7 +1,7 @@
 # Display Functions
 .data
 # Display strings
-msg_mult_matrix_label:   .asciiz "Multiplication Matrix:\n"
+msg_mult_matrix_label:   .asciiz "\nMultiplication Matrix:\n"
 msg_owner_matrix_label:  .asciiz "Matrix of Claimed Positions (0=unclaimed, 1=player, 2=computer):\n"
 msg_prod_label:      .asciiz "The current product is: "
 mult:            .asciiz " x "
@@ -13,8 +13,8 @@ horiz_line:      .asciiz "+----+----+----+----+----+----+\n"
 vert_line:       .asciiz "|"
 
 # --- Strings for display_move ---
-msg_player:           .asciiz "Player"
-msg_computer:         .asciiz "Computer"
+msg_player:           .asciiz "\nPlayer"
+msg_computer:         .asciiz "\nComputer"
 msg_changed:          .asciiz " changed the "
 msg_first:            .asciiz "first"
 msg_second:           .asciiz "second"
@@ -22,7 +22,8 @@ msg_factor_to:        .asciiz " factor to be "
 msg_period_newline:   .asciiz ".\n"
 
 .text
-.globl display_move
+.globl display_move, print_mult_matrix
+
 # ==============================================================================
 # Display a move
 # Input: $a0 = player ID (1=player, 2=computer), 
@@ -42,16 +43,10 @@ display_move:
     move $s1, $a1          # Store factor index
     move $s2, $a2          # Store new value
 
-    # --- Display Matrices ---
     # Display Game Matrix (Products)
-    la $a0, msg_mult_matrix_label
-    la $a1, game_matrix
-    jal print_matrix
-
+    jal print_mult_matrix
     # Display Owner Matrix (Current claims)
-    la $a0, msg_owner_matrix_label
-    la $a1, owner_matrix
-    jal print_matrix
+    jal print_owner_matrix
 
     # --- Print Move Description Sentence ---
     # "{Player/Computer} changed the {first/second} factor to be {value}."
@@ -145,6 +140,31 @@ display_factor_to_msg:
     lw $ra, 16($sp)
     addi $sp, $sp, 20   # restore stack pointer
     jr $ra                
+
+# ==============================================================================
+print_mult_matrix:
+    addi $sp, $sp, -4
+    sw $ra, 0($sp)
+
+    la $a0, msg_mult_matrix_label
+    la $a1, game_matrix
+    jal print_matrix
+
+    lw $ra, 0($sp)
+    addi $sp, $sp, 4
+    jr $ra
+
+print_owner_matrix:
+    addi $sp, $sp, -4
+    sw $ra, 0($sp)
+
+    la $a0, msg_owner_matrix_label
+    la $a1, owner_matrix
+    jal print_matrix
+
+    lw $ra, 0($sp)
+    addi $sp, $sp, 4
+    jr $ra
 
 # ==============================================================================
 # Prints a 6x6 matrix of words stored linearly in memory, with formatting.

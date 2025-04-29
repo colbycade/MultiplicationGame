@@ -13,10 +13,11 @@ msg_newline:         .asciiz "\n"
 .text
 .globl main
 main:
-    # Intro message
+    # Intro message and game matrix
     li $v0, 4
     la $a0, msg_welcome
     syscall
+    jal print_mult_matrix
 
     # --- Initial Moves ---
     # Computer picks first factor
