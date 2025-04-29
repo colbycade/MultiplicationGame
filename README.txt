@@ -12,9 +12,9 @@ To run this program,
 5. Enter input and press enter in the command line to play!
 
 # Gameplay
-1. Computer goes first by moving the "below" pointer to any position 1-9
-2. User responds by moving the "above" pointer to any position 1-9
-3. The product of the two pointers is "claimed" for the user
-4. After initial moves, players take turns moving either pointer
-    a. To be a valid move, the resulting product must not already be claimed
-5. After each player makes a move, check if the player has won by having four claimed products in a row (horizontal, vertical, or diagonal)
+1. Computer goes first by choosing a value 1-9.
+2. User responds by choosing a second value 1-9.
+3. The product of these two numbers is "claimed" for the user and can no longer be used.
+4. After these initial moves, players take turns changing either factor.
+    a. To be a valid move, the resulting product must not already be claimed.
+5. A player wins by having four claimed products in a row (horizontal, vertical, or diagonal).
