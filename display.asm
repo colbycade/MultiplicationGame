@@ -1,7 +1,7 @@
 # Display Functions
 .data
 # Display strings
-msg_mult_matrix_label:   .asciiz "\nMultiplication Matrix:\n"
+msg_mult_matrix_label:   .asciiz "Multiplication Matrix:\n"
 msg_owner_matrix_label:  .asciiz "Matrix of Claimed Positions (0=unclaimed, 1=player, 2=computer):\n"
 msg_prod_label:      .asciiz "The current product is: "
 mult:            .asciiz " x "
@@ -133,7 +133,8 @@ display_factor_to_msg:
     syscall                
 
     li $v0, 4
-    la $a0, newline   # Newline after equation
+    la $a0, newline   # Newlines after equation
+    syscall
     syscall
 
     # cleanup stack frame
