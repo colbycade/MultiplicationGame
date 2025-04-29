@@ -1,18 +1,15 @@
-# Data
-- Array of numbers [1, 2, 3, 4, 5, 6, 7, 8, 9]
-- Two pointers: one "above" and one "below" the array (initially unassigned)
-- 6×6 matrix with the 36 unique products from multiplying numbers 1-9
-    - The unique products are: 
-        1,  2,  3,  4,  5,  6, 
-        7,  8,  9, 10, 12, 14, 
-        15, 16, 18, 20, 21, 24, 
-        25, 27, 28, 30, 32, 35, 
-        36, 40, 42, 45, 48, 49, 
-        54, 56, 63, 64, 72, 81
-- Board state (initalized as all 0)
-    - 0: Unclaimed
-    - 1: Claimed by User
-    - 2: Claimed by Computer
+# The Multiplication Game
+This is a MIPS Assembly implementation of the following game: https://www.mathsisfun.com/games/multiplication-game.html
+
+# Instructions
+To run this program, 
+1. Download the MARS MIPS Assembler
+2. Identify the path to the Mars.jar file
+3. Navigate to the project folder:
+    `cd Path/To/MultiplicationGame`
+4. Compile and run the files:
+    `java -jar ~/Desktop/UTD/Spring25/SE2340/Mars.jar sm *.asm`
+5. Enter input and press enter in the command line to play!
 
 # Gameplay
 1. Computer goes first by moving the "below" pointer to any position 1-9
