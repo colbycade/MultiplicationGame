@@ -16,5 +16,7 @@ To run this program,
 2. User responds by choosing a second value 1-9.
 3. The product of these two numbers is "claimed" for the user and can no longer be used.
 4. After these initial moves, players take turns changing either factor.
-    a. To be a valid move, the resulting product must not already be claimed.
+    a. To make a move, the user first specifies which factor they want to change (1 for first, 2 for second).
+    b. They then input a new value 1-9.
+    c. To be a valid move, the resulting product must not already be claimed.
 5. A player wins by having four claimed products in a row (horizontal, vertical, or diagonal).
