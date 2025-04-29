@@ -13,13 +13,31 @@ game_matrix:    .word  1,  2,  3,  4,  5,  6
                 .word 36, 40, 42, 45, 48, 49
                 .word 54, 56, 63, 64, 72, 81
 
-# Ownership matrix (0=unclaimed, 1=player, 2=computer)
+# Initial ownership matrix (0=unclaimed, 1=player, 2=computer)
 owner_matrix:   .word 0,0,0,0,0,0,
                 .word 0,0,0,0,0,0,
                 .word 0,0,0,0,0,0,
                 .word 0,0,0,0,0,0,
                 .word 0,0,0,0,0,0,
                 .word 0,0,0,0,0,0
+
+# --- Example Games (assuming computer always starts with 1)
+# Example game where the computer will win on first move
+# owner_matrix:   .word 2,2,0,2,0,0,
+#                 .word 2,2,0,2,0,0,
+#                 .word 0,0,0,0,0,0,
+#                 .word 0,0,0,0,0,0,
+#                 .word 0,0,0,0,0,0,
+#                 .word 0,0,0,0,0,0
+
+# Example game where the player can win on first move (after initial)
+# Initial 9 then change factor1 to 9 will win
+# owner_matrix:   .word 0,0,0,0,0,0,
+#                 .word 0,0,0,0,0,0,
+#                 .word 0,0,0,0,0,1,
+#                 .word 0,0,0,0,0,1,
+#                 .word 0,0,0,0,0,1,
+#                 .word 1,1,0,1,1,0
 
 .text
 .globl mark_claimed, is_claimed, get_board_index, check_win_for_product

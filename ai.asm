@@ -22,6 +22,7 @@ ai_select_initial_factor1:
     syscall
 
     addi $v0, $a0, 1  # shift range from [0-8] to [1-9]
+    # li $v0, 1         # uncomment to always return 1 for testing
     jr $ra            # return to caller
 
 # ==============================================================================
